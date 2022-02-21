@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import ttk
 import datetime
 import windnd
-# from tkinter.messagebox import  showinfo
+# from tkinter.messagebox import showinfo
 
 window = tk.Tk()
 window.title('7MMTV爬蟲')
@@ -17,14 +17,16 @@ window.geometry('400x300')
 window.configure(background='white')
 
 
-# 拖曳功能
+# 拖曳功能 路徑有中文會報錯
 def dragged_files(files):
-    msg = '\n'.join((item.decode('gbk') for item in files))
+    msg = '\n'.join((item.decode('utf-8') for item in files))
     # showinfo('您拖放的文件',msg)
-    batch_entry.delete(0,"end")
+    batch_entry.delete(0, "end")
     batch_entry.insert(0, msg)
+    result_label.configure(text="")
 
-windnd.hook_dropfiles(window,func=dragged_files)
+
+windnd.hook_dropfiles(window, func=dragged_files)
 
 
 # 關鍵字或網址特定索引的爬蟲觸發入口
@@ -35,38 +37,40 @@ def web_crawler():
         searchName = index_entry.get()
     else:
         html = getKeyWordHtml(num_entry.get())
-        searchName = num_entry.get() 
+        searchName = num_entry.get()
     # 呼叫爬蟲方法
-    Scrapy(html,searchName)
+    Scrapy(html, searchName)
 
 
 # 藉由關鍵字取得google搜尋的網站網址
-def getKeyWordHtml(key):  
-        key_word = key+"+7MMTV"
-        _html = requests.get('https://www.google.com/search',
-                            headers={'Accept': 'application/json'},
-                            # 搜尋 google.com/search?q={key_word}
-                            params={'q': key_word}
-                            )
-        sp = BeautifulSoup(_html.text, 'html.parser')
-        # print(sp)
-        st1 = sp.find("div", class_="kCrYT")
-        # print(st1)
-        st2 = st1.find("a").get("href")
-        # print(st2)
-        st3 = st2.replace('/url?q=', '').replace('/en/',
-                                                 '/zh/').split("%5D%", 1)
-        # 最終網址
-        # print(st3[0]+"/index.html")
-        _html = st3[0]+"/index.html"  
-        return _html
+def getKeyWordHtml(key):
+    key_word = key+"+7MMTV"
+    _html = requests.get('https://www.google.com/search',
+                         headers={'Accept': 'application/json'},
+                         # 搜尋 google.com/search?q={key_word}
+                         params={'q': key_word}
+                         )
+    sp = BeautifulSoup(_html.text, 'html.parser')
+    # print(sp)
+    st1 = sp.find("div", class_="kCrYT")
+    # print(st1)
+    st2 = st1.find("a").get("href")
+    # print(st2)
+    st3 = st2.replace('/url?q=', '').replace('/en/',
+                                             '/zh/').split("%5D%", 1)
+    # 最終網址
+    # print(st3[0]+"/index.html")
+    _html = st3[0]+"/index.html"
+    return _html
 
 
 '''
-爬蟲邏輯 
+爬蟲邏輯
 args1:網址
 args2:關鍵字
 '''
+
+
 def Scrapy(goalSt, name):
     mmtv = requests.get(goalSt)
     mmtvsp = BeautifulSoup(mmtv.text, "html.parser")
@@ -159,28 +163,31 @@ def Scrapy(goalSt, name):
 # 批次爬蟲觸發入口
 def web_batchCrawler():
     if(batch_entry.get() != ''):
-        path = batch_entry.get() #資料夾目錄 EX.D:/myPython/sample
-        files= os.listdir(path) #得到資料夾下的所有檔名稱
-        for file in files: #遍歷資料夾
+        path = batch_entry.get()  # 資料夾目錄 EX.D:/myPython/sample
+        files = os.listdir(path)  # 得到資料夾下的所有檔名稱
+        for file in files:  # 遍歷資料夾
             fi_d = os.path.join(path, file)
-            if os.path.isdir(fi_d): #判斷是否是資料夾
-                cfiles= os.listdir(fi_d)
-                for f in cfiles: #遍歷子資料夾
+            if os.path.isdir(fi_d):  # 判斷是否是資料夾
+                cfiles = os.listdir(fi_d)
+                for f in cfiles:  # 遍歷子資料夾
                     id = os.path.join(fi_d, f)
-                    if os.path.splitext(id)[1]=='.mp4':
+                    if os.path.splitext(id)[1] == '.mp4':
                         # print(file+'這是要執行的地方') #列印結果
                         # 開始爬
-                        Scrapy(getKeyWordHtml(file),file)
-                        break    
+                        Scrapy(getKeyWordHtml(file), file)
+                        break
+        result_label.configure(text="批次完成!")
 
 # 寫入LOG紀錄
+
+
 def writeLog(txt):
-    pathDir='logger'
+    pathDir = 'logger'
     if not os.path.exists(pathDir):
         os.makedirs(pathDir)  # 遞迴建立資料夾
     # 有檔案寫入，無檔創建寫入
-    file = open( pathDir+'/logger.txt', 'a', encoding = "utf-8" )
-    file.write( txt+'未產生--'+str(datetime.datetime.now())+'\n')    
+    file = open(pathDir+'/logger.txt', 'a', encoding="utf-8")
+    file.write(txt+'未產生--'+str(datetime.datetime.now())+'\n')
     file.close()
 
 
@@ -208,7 +215,7 @@ calculate_btn = tk.Button(window, text='馬上爬蟲', command=web_crawler)
 calculate_btn.pack()
 
 # 分隔線
-b=ttk.Separator(window,orient='horizontal')
+b = ttk.Separator(window, orient='horizontal')
 b.pack(fill=tk.X)
 
 # 資料夾批次搜尋
