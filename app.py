@@ -6,12 +6,25 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from xml.etree import cElementTree
 import tkinter as tk
+from tkinter import ttk
 import datetime
+import windnd
+# from tkinter.messagebox import  showinfo
 
 window = tk.Tk()
 window.title('7MMTV爬蟲')
 window.geometry('400x300')
 window.configure(background='white')
+
+
+# 拖曳功能
+def dragged_files(files):
+    msg = '\n'.join((item.decode('gbk') for item in files))
+    # showinfo('您拖放的文件',msg)
+    batch_entry.delete(0,"end")
+    batch_entry.insert(0, msg)
+
+windnd.hook_dropfiles(window,func=dragged_files)
 
 
 # 關鍵字或網址特定索引的爬蟲觸發入口
@@ -194,10 +207,14 @@ result_label.pack()
 calculate_btn = tk.Button(window, text='馬上爬蟲', command=web_crawler)
 calculate_btn.pack()
 
+# 分隔線
+b=ttk.Separator(window,orient='horizontal')
+b.pack(fill=tk.X)
+
 # 資料夾批次搜尋
 batch_frame = tk.Frame(window)
 batch_frame.pack(side=tk.TOP)
-batch_label = tk.Label(index_frame, text='資料夾目錄')
+batch_label = tk.Label(batch_frame, text='資料夾目錄')
 batch_label.pack(side=tk.LEFT)
 batch_entry = tk.Entry(batch_frame)
 batch_entry.pack(side=tk.LEFT)
