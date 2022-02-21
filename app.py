@@ -213,7 +213,7 @@ b.pack(fill=tk.X)
 
 # 資料夾批次搜尋
 batch_frame = tk.Frame(window)
-batch_frame.pack(side=tk.TOP)
+batch_frame.pack(padx=20, pady=10)
 batch_label = tk.Label(batch_frame, text='資料夾目錄')
 batch_label.pack(side=tk.LEFT)
 batch_entry = tk.Entry(batch_frame)
