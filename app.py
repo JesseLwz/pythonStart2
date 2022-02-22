@@ -17,9 +17,9 @@ window.geometry('400x300')
 window.configure(background='white')
 
 
-# 拖曳功能 路徑有中文會報錯
+# 拖曳功能 路徑有中文會報錯，改成大五碼轉碼
 def dragged_files(files):
-    msg = '\n'.join((item.decode('utf-8') for item in files))
+    msg = '\n'.join((item.decode('Big5') for item in files))
     # showinfo('您拖放的文件',msg)
     batch_entry.delete(0, "end")
     batch_entry.insert(0, msg)
